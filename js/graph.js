@@ -22,7 +22,8 @@
 
   function pos(star) {
     var c = DF.PHASES[star.phase].center;
-    return { x: c.x + star.off[0], y: c.y + star.off[1] };
+    // widen a touch horizontally, compress vertically so stacked phases do not collide
+    return { x: c.x + star.off[0] * 1.12, y: c.y + star.off[1] * 0.72 };
   }
 
   function computeBounds() {
@@ -125,15 +126,27 @@
   }
 
   /* ---- view control ---- */
-  function clampScale(s) { return Math.max(0.28, Math.min(2.2, s)); }
+  function clampScale(s) { return Math.max(0.16, Math.min(2.2, s)); }
 
+  // whole-tree overview (used by the fit button)
   function fit() {
     var vw = window.innerWidth, vh = window.innerHeight;
     var W = bounds.maxX - bounds.minX, H = bounds.maxY - bounds.minY;
-    var scale = clampScale(Math.min((vw - 80) / W, (vh - 200) / H));
+    var scale = clampScale(Math.min((vw - 80) / W, (vh - 160) / H));
     view.scale = scale;
     view.tx = (vw - W * scale) / 2;
     view.ty = (vh - H * scale) / 2 + 10;
+    applyTransform();
+  }
+
+  // opening view: the base of the tree (Launchpad), at a readable scale, anchored near the bottom
+  function home() {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var W = bounds.maxX - bounds.minX, H = bounds.maxY - bounds.minY;
+    var scale = clampScale(Math.min((vw - 120) / W, 0.68));
+    view.scale = scale;
+    view.tx = (vw - W * scale) / 2;
+    view.ty = vh - H * scale - 70;
     applyTransform();
   }
 
@@ -226,7 +239,7 @@
   window.addEventListener("resize", function () { /* keep current view; user can hit fit */ });
 
   DF.graph = {
-    build: build, refresh: refresh, fit: fit, focus: focus, highlight: highlight,
+    build: build, refresh: refresh, fit: fit, home: home, focus: focus, highlight: highlight,
     zoomIn: function () { zoomAt(1.2, window.innerWidth / 2, window.innerHeight / 2); },
     zoomOut: function () { zoomAt(0.83, window.innerWidth / 2, window.innerHeight / 2); },
     search: search, filterPhase: filterPhase, clearFilter: clearFilter,

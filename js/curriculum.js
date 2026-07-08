@@ -8,17 +8,19 @@ window.DF = window.DF || {};
 
 DF.LEVEL = "I am a Computer Science graduate: a strong programmer, comfortable in Python, but new to SQL and to the data-engineering field. Lean on my CS background; go fast on programming fundamentals, and be thorough on data-specific ideas.";
 
+/* Laid out bottom-to-top: Launchpad is the base of the tree, the Capstone is the crown.
+   Lower phases sit at larger y (screen bottom); later phases climb upward. */
 DF.PHASES = {
-  launch: { name: "Launchpad", order: 0, center: { x: 210, y: 860 } },
-  ai:     { name: "AI-Assisted Engineering", order: 1, center: { x: 600, y: 360 } },
-  sql:    { name: "SQL & Data Modeling", order: 2, center: { x: 640, y: 1300 } },
-  py:     { name: "Python for Data Engineering", order: 3, center: { x: 1080, y: 820 } },
-  wh:     { name: "Warehouse & Analytics Engineering", order: 4, center: { x: 1520, y: 360 } },
-  orch:   { name: "Orchestration & DataOps", order: 5, center: { x: 1520, y: 1320 } },
-  cloud:  { name: "AWS Cloud & Lakehouse", order: 6, center: { x: 2000, y: 820 } },
-  stream: { name: "Big Data & Streaming", order: 7, center: { x: 2430, y: 1320 } },
-  llm:    { name: "AI & LLM Engineering", order: 8, center: { x: 2600, y: 360 } },
-  cap:    { name: "Capstone & Getting Hired", order: 9, center: { x: 2950, y: 860 } }
+  launch: { name: "Launchpad", order: 0, center: { x: 1350, y: 3720 } },
+  ai:     { name: "AI-Assisted Engineering", order: 1, center: { x: 1350, y: 3340 } },
+  sql:    { name: "SQL & Data Modeling", order: 2, center: { x: 1350, y: 2960 } },
+  py:     { name: "Python for Data Engineering", order: 3, center: { x: 1350, y: 2580 } },
+  wh:     { name: "Warehouse & Analytics Engineering", order: 4, center: { x: 1350, y: 2200 } },
+  orch:   { name: "Orchestration & DataOps", order: 5, center: { x: 1350, y: 1820 } },
+  cloud:  { name: "AWS Cloud & Lakehouse", order: 6, center: { x: 1350, y: 1440 } },
+  stream: { name: "Big Data & Streaming", order: 7, center: { x: 1350, y: 1060 } },
+  llm:    { name: "AI & LLM Engineering", order: 8, center: { x: 1350, y: 680 } },
+  cap:    { name: "Capstone & Getting Hired", order: 9, center: { x: 1350, y: 300 } }
 };
 
 DF.STARS = [

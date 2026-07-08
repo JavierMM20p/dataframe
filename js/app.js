@@ -173,7 +173,7 @@
   // ---- startup ----
   var imported = DF.store.applyFromLocation();
   DF.graph.build();
-  DF.graph.fit();
+  DF.graph.home();
   buildLegend();
   updateProgress();
   wire();
