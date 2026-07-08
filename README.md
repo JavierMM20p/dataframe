@@ -5,6 +5,8 @@ web app that lays out a full data-engineering and AI-engineering curriculum as a
 constellation of lessons. Open any star and it assembles a complete teaching prompt for your
 own AI (Claude, ChatGPT, or Claude Code), which then runs the lesson as your professor.
 
+**Live site: https://javiermm20p.github.io/dataframe/**
+
 ## Highlights
 
 - **Navigable galaxy** of ~70 lessons and projects across 10 constellations, from SQL and
