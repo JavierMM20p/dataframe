@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>DataFrame</title>
+  <meta name="description" content="A knowledge galaxy for data engineers. Navigate a constellation of lessons, each taught by your own AI." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308080a'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23f4f4f6'/%3E%3Ccircle cx='6' cy='7' r='1.4' fill='%239c9ca4'/%3E%3Ccircle cx='26' cy='9' r='1.4' fill='%239c9ca4'/%3E%3Ccircle cx='24' cy='25' r='1.4' fill='%239c9ca4'/%3E%3Ccircle cx='7' cy='24' r='1.4' fill='%239c9ca4'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <div class="haze" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <header class="hud">
+    <div class="brand">
+      <span class="mark"><span class="brk">[</span>DataFrame<span class="brk">]</span></span>
+      <span class="tag">A knowledge galaxy for data engineers</span>
+    </div>
+    <div class="hud-search">
+      <input id="search" type="search" placeholder="Search lessons" aria-label="Search lessons" autocomplete="off" />
+    </div>
+    <div class="spacer"></div>
+    <div class="prog" title="Your overall progress">
+      <div class="row"><span>Your journey</span><span id="progText"><b>0%</b></span></div>
+      <div class="bar"><i id="progBar"></i></div>
+    </div>
+    <button class="next" id="nextBtn">What's next?</button>
+    <button class="icon-btn" id="menuBtn" aria-label="Progress menu" title="Progress &amp; data">&#8942;</button>
+  </header>
+
+  <main class="galaxy" id="galaxy" aria-label="Curriculum constellation graph">
+    <div id="world" class="world">
+      <svg id="edges" class="edges" aria-hidden="true"></svg>
+      <div id="nodes" class="nodes"></div>
+    </div>
+  </main>
+
+  <div class="zoom">
+    <button class="zoom-btn" id="zoomIn" aria-label="Zoom in">+</button>
+    <button class="zoom-btn" id="zoomOut" aria-label="Zoom out">&#8722;</button>
+    <button class="zoom-btn" id="zoomFit" aria-label="Fit to view" title="Fit to view">&#9633;</button>
+  </div>
+
+  <aside class="legend" id="legend">
+    <h4>Constellations</h4>
+    <div class="clist" id="clist"></div>
+    <div class="st">
+      <span><i class="sw avail"></i>available</span>
+      <span><i class="sw prog"></i>in progress</span>
+      <span><i class="sw done"></i>complete</span>
+      <span><i class="sw lock"></i>locked</span>
+    </div>
+    <div class="st2"><span><i class="sw ring-c"></i>lesson</span><span><i class="sw ring-s"></i>project</span></div>
+  </aside>
+
+  <div class="hint" id="hint">
+    <span>Drag to pan, scroll to zoom. Click any star &mdash; your <b>AI becomes the professor</b> for that lesson.</span>
+    <button id="hintX" aria-label="dismiss">&times;</button>
+  </div>
+
+  <aside class="panel" id="panel" aria-hidden="true" aria-label="Lesson detail">
+    <button class="x" id="panelX" aria-label="Close panel">&times;</button>
+    <div class="scroll" id="panelBody"></div>
+  </aside>
+
+  <div class="menu" id="menu" aria-hidden="true">
+    <h4>Progress &amp; data</h4>
+    <p id="menuStat">0 of 0 stars complete</p>
+    <button class="menu-item" id="exportBtn">Export progress (file)</button>
+    <button class="menu-item" id="importBtn">Import progress (file)</button>
+    <button class="menu-item" id="linkBtn">Copy a progress link</button>
+    <button class="menu-item danger" id="resetBtn">Reset all progress</button>
+    <input id="importFile" type="file" accept="application/json" hidden />
+  </div>
+
+  <div class="overlay" id="onboard" aria-hidden="true">
+    <div class="ob-card">
+      <div class="ob-mark"><span class="brk">[</span>DataFrame<span class="brk">]</span></div>
+      <h2>Chart your path into data engineering.</h2>
+      <p>This is a galaxy of lessons. Each <b>star</b> is a topic or a portfolio project. Open one and it hands your AI &mdash; Claude, ChatGPT, or Claude&nbsp;Code &mdash; a full teaching prompt, so it becomes your professor for that lesson.</p>
+      <ul class="ob-list">
+        <li>Complete a star to light up the next ones along the path.</li>
+        <li>Every project is built to be a standalone, production-ready repo for your portfolio.</li>
+        <li>Progress is saved in this browser. Export it anytime.</li>
+      </ul>
+      <button class="ob-go" id="obGo">Enter the galaxy</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="./js/curriculum.js"></script>
+  <script src="./js/template.js"></script>
+  <script src="./js/store.js"></script>
+  <script src="./js/starfield.js"></script>
+  <script src="./js/graph.js"></script>
+  <script src="./js/panel.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
