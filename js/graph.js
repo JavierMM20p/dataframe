@@ -40,6 +40,31 @@
     world.style.transform = "translate(" + view.tx + "px," + view.ty + "px) scale(" + view.scale + ")";
   }
 
+  function anchorFor(id) {
+    var el = nodeEls[id];
+    if (!el) return null;
+    var node = el.querySelector(".node");
+    if (!node) return null;
+    var left = parseFloat(el.style.left) || 0;
+    var top = parseFloat(el.style.top) || 0;
+    return {
+      x: left - el.offsetWidth / 2 + node.offsetLeft + node.offsetWidth / 2,
+      y: top - el.offsetHeight / 2 + node.offsetTop + node.offsetHeight / 2
+    };
+  }
+
+  function positionEdges() {
+    edgeList.forEach(function (edge) {
+      var from = anchorFor(edge.from);
+      var to = anchorFor(edge.to);
+      if (!from || !to) return;
+      edge.el.setAttribute("x1", from.x);
+      edge.el.setAttribute("y1", from.y);
+      edge.el.setAttribute("x2", to.x);
+      edge.el.setAttribute("y2", to.y);
+    });
+  }
+
   function build() {
     computeBounds();
     var W = bounds.maxX - bounds.minX, H = bounds.maxY - bounds.minY;
@@ -102,6 +127,7 @@
 
     refresh();
     applyTransform();
+    requestAnimationFrame(positionEdges);
   }
 
   function refresh() {
@@ -123,6 +149,7 @@
       else if (a && (toStatus === "available" || toStatus === "progress")) cls = "active";
       e.el.setAttribute("class", cls);
     });
+    requestAnimationFrame(positionEdges);
   }
 
   /* ---- view control ---- */
