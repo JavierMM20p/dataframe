@@ -1,6 +1,6 @@
 # DataFrame
 
-A knowledge galaxy for becoming a data engineer. DataFrame is a single-page, dependency-free
+An structured knowledge source for becoming a data engineer. DataFrame is a single-page, dependency-free
 web app that lays out a full data-engineering and AI-engineering curriculum as an interactive
 constellation of lessons. Open any star and it assembles a complete teaching prompt for your
 own AI (Claude, ChatGPT, or Claude Code), which then runs the lesson as your professor.

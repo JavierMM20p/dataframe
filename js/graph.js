@@ -20,10 +20,135 @@
   var edgeList = [];  // {el, from, to}
   var reduce = matchMedia("(prefers-reduced-motion:reduce)").matches;
 
+  /* ------------------------------------------------------------------
+     Layered ("Sugiyama-style") layout.
+     Phases stay grouped as horizontal bands (topic clusters) stacked
+     bottom-to-top. Inside each phase, nodes are split into sub-rows by
+     dependency depth; rows are ordered left-to-right by a barycenter
+     heuristic to reduce edge crossings, then centered on a vertical
+     trunk. Long edges are routed through dummy waypoints so they thread
+     between nodes instead of crossing over them.
+     ------------------------------------------------------------------ */
+  var LG = {
+    COLGAP: 165,   // horizontal room reserved for a real node
+    DUMGAP: 76,    // slimmer lane reserved for an edge waypoint
+    ROWGAP: 88,    // vertical gap between adjacent sub-rows
+    PHASEGAP: 60,  // extra vertical gap between phases (band separation)
+    CENTER_X: 1350
+  };
+  var LAYOUT = null; // { pos:{id->{x,y}}, dummy:{id->{x,y}}, edges:[{from,to,chain}] }
+
+  function median(a) {
+    if (!a.length) return null;
+    a = a.slice().sort(function (x, y) { return x - y; });
+    var m = a.length >> 1;
+    return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+  }
+
+  function computeLayout() {
+    var stars = DF.STARS, byId = {};
+    stars.forEach(function (s) { byId[s.id] = s; });
+    var ord = function (pid) { return DF.PHASES[pid].order; };
+
+    // intra-phase longest-path depth => sub-rows within a phase band
+    var depth = {};
+    function d(id) {
+      if (depth[id] != null) return depth[id];
+      depth[id] = 0; // guard against cycles
+      var s = byId[id], m = 0;
+      (s.prereq || []).forEach(function (p) {
+        if (byId[p] && byId[p].phase === s.phase) m = Math.max(m, d(p) + 1);
+      });
+      return depth[id] = m;
+    }
+    stars.forEach(function (s) { d(s.id); });
+
+    // global rows ordered bottom-to-top by (phaseOrder, depth)
+    var keyOf = function (s) { return ord(s.phase) * 100 + depth[s.id]; };
+    var keys = []; stars.forEach(function (s) { var k = keyOf(s); if (keys.indexOf(k) < 0) keys.push(k); });
+    keys.sort(function (a, b) { return a - b; });
+    var rankOf = {}; keys.forEach(function (k, i) { rankOf[k] = i; });
+    var starRank = {}; stars.forEach(function (s) { starRank[s.id] = rankOf[keyOf(s)]; });
+
+    var N = keys.length, levels = [];
+    for (var i = 0; i < N; i++) levels.push([]);
+    stars.forEach(function (s) { levels[starRank[s.id]].push({ id: s.id, real: true }); });
+
+    // edges, expanded with dummy waypoints for every intermediate row
+    var edges = [], neigh = {};
+    stars.forEach(function (s) { neigh[s.id] = []; });
+    function link(a, b) { (neigh[a] = neigh[a] || []).push(b); (neigh[b] = neigh[b] || []).push(a); }
+    var dseq = 0;
+    stars.forEach(function (s) {
+      (s.prereq || []).forEach(function (pid) {
+        if (!byId[pid]) return;
+        var r0 = starRank[pid], r1 = starRank[s.id];
+        var lo = Math.min(r0, r1), hi = Math.max(r0, r1);
+        var chain = [pid], prev = pid;
+        for (var r = lo + 1; r < hi; r++) {
+          var did = "§" + (dseq++);
+          levels[r].push({ id: did, real: false });
+          neigh[did] = [];
+          link(prev, did); prev = did; chain.push(did);
+        }
+        link(prev, s.id); chain.push(s.id);
+        edges.push({ from: pid, to: s.id, chain: r0 <= r1 ? chain : chain.slice().reverse() });
+      });
+    });
+
+    // seed ordering by the old hand-placed x, then reduce crossings by barycenter sweeps
+    var order = {};
+    levels.forEach(function (L) {
+      L.sort(function (a, b) {
+        var xa = a.real ? byId[a.id].off[0] : 0, xb = b.real ? byId[b.id].off[0] : 0;
+        return (xa - xb) || (a.id < b.id ? -1 : 1);
+      });
+      L.forEach(function (n, i) { order[n.id] = i; });
+    });
+    for (var it = 0; it < 20; it++) {
+      var seq = it % 2 ? levels.slice().reverse() : levels;
+      seq.forEach(function (L) {
+        var b = {};
+        L.forEach(function (n) { var m = median((neigh[n.id] || []).map(function (x) { return order[x]; })); b[n.id] = m == null ? order[n.id] : m; });
+        L.sort(function (p, q) { return (b[p.id] - b[q.id]) || (order[p.id] - order[q.id]); });
+        L.forEach(function (n, i) { order[n.id] = i; });
+      });
+    }
+
+    // x-coordinate: pack each row with variable-width slots, then center it on the trunk
+    var hw = {};
+    levels.forEach(function (L) { L.forEach(function (n) { hw[n.id] = (n.real ? LG.COLGAP : LG.DUMGAP) / 2; }); });
+    var x = {};
+    levels.forEach(function (L) {
+      var c = 0;
+      L.forEach(function (n) { c += hw[n.id]; x[n.id] = c; c += hw[n.id]; });
+      var mid = c / 2;
+      L.forEach(function (n) { x[n.id] += LG.CENTER_X - mid; });
+    });
+
+    // y-coordinate: cumulative from bottom, extra gap between phases
+    var yForRank = [], curY = 0;
+    for (var r = 0; r < N; r++) {
+      if (r > 0) {
+        var gap = LG.ROWGAP;
+        if (Math.floor(keys[r] / 100) !== Math.floor(keys[r - 1] / 100)) gap += LG.PHASEGAP;
+        curY -= gap;
+      }
+      yForRank[r] = curY;
+    }
+    var rankById = {}; levels.forEach(function (L, r) { L.forEach(function (n) { rankById[n.id] = r; }); });
+
+    var posMap = {}, dummyMap = {};
+    for (var id in x) {
+      var pt = { x: x[id], y: yForRank[rankById[id]] };
+      if (byId[id]) posMap[id] = pt; else dummyMap[id] = pt;
+    }
+    return { pos: posMap, dummy: dummyMap, edges: edges };
+  }
+
   function pos(star) {
-    var c = DF.PHASES[star.phase].center;
-    // widen a touch horizontally, compress vertically so stacked phases do not collide
-    return { x: c.x + star.off[0] * 1.12, y: c.y + star.off[1] * 0.72 };
+    if (!LAYOUT) LAYOUT = computeLayout();
+    return LAYOUT.pos[star.id];
   }
 
   function computeBounds() {
@@ -53,15 +178,35 @@
     };
   }
 
+  // point for a chain member: real nodes use their live DOM anchor,
+  // dummy waypoints use their stored layout coords (in layer space)
+  function chainPoint(id) {
+    if (LAYOUT.dummy[id]) {
+      var dp = LAYOUT.dummy[id];
+      return { x: dp.x - bounds.minX, y: dp.y - bounds.minY };
+    }
+    return anchorFor(id);
+  }
+
+  // smooth path through the chain: straight for direct edges, rounded at
+  // each waypoint (quadratic through the midpoints) for routed long edges
+  function chainPath(chain) {
+    var pts = [];
+    for (var i = 0; i < chain.length; i++) { var p = chainPoint(chain[i]); if (!p) return null; pts.push(p); }
+    if (pts.length === 2) return "M" + pts[0].x + "," + pts[0].y + " L" + pts[1].x + "," + pts[1].y;
+    var d = "M" + pts[0].x + "," + pts[0].y;
+    for (var j = 1; j < pts.length - 1; j++) {
+      var mx = (pts[j].x + pts[j + 1].x) / 2, my = (pts[j].y + pts[j + 1].y) / 2;
+      d += " Q" + pts[j].x + "," + pts[j].y + " " + mx + "," + my;
+    }
+    d += " L" + pts[pts.length - 1].x + "," + pts[pts.length - 1].y;
+    return d;
+  }
+
   function positionEdges() {
     edgeList.forEach(function (edge) {
-      var from = anchorFor(edge.from);
-      var to = anchorFor(edge.to);
-      if (!from || !to) return;
-      edge.el.setAttribute("x1", from.x);
-      edge.el.setAttribute("y1", from.y);
-      edge.el.setAttribute("x2", to.x);
-      edge.el.setAttribute("y2", to.y);
+      var d = chainPath(edge.chain);
+      if (d) edge.el.setAttribute("d", d);
     });
   }
 
@@ -74,18 +219,11 @@
     svg.setAttribute("height", H);
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
 
-    // edges
-    DF.STARS.forEach(function (s) {
-      (s.prereq || []).forEach(function (pid) {
-        var a = DF.STARS.find(function (x) { return x.id === pid; });
-        if (!a) return;
-        var pa = pos(a), pb = pos(s);
-        var ln = document.createElementNS(SVGNS, "line");
-        ln.setAttribute("x1", pa.x - bounds.minX); ln.setAttribute("y1", pa.y - bounds.minY);
-        ln.setAttribute("x2", pb.x - bounds.minX); ln.setAttribute("y2", pb.y - bounds.minY);
-        svg.appendChild(ln);
-        edgeList.push({ el: ln, from: pid, to: s.id });
-      });
+    // edges (routed through dummy waypoints; drawn as smooth SVG paths)
+    LAYOUT.edges.forEach(function (e) {
+      var ln = document.createElementNS(SVGNS, "path");
+      svg.appendChild(ln);
+      edgeList.push({ el: ln, from: e.from, to: e.to, chain: e.chain });
     });
 
     // constellation labels
