@@ -8,19 +8,34 @@ window.DF = window.DF || {};
 
 DF.LEVEL = "I am a Computer Science graduate: a strong programmer, comfortable in Python, but new to SQL and to the data-engineering field. Lean on my CS background; go fast on programming fundamentals, and be thorough on data-specific ideas.";
 
+/* Skill levels: a pre-hire ladder that groups the constellations into gated tiers.
+   Every level is still pre-data-engineer; the final level is a job *candidate*, not yet hired.
+   Progression is gated by prereqs (see below): the first star(s) of each level require the
+   previous level's exit milestone(s), so a level unlocks only when the prior one is complete
+   (electives excepted). LEVELS is descriptive metadata; the gating lives in the prereq graph. */
+DF.LEVELS = {
+  initiate:     { name: "Initiate",     order: 1, phases: ["launch", "ai"],      exit: ["m0"] },
+  apprentice:   { name: "Apprentice",   order: 2, phases: ["sql", "py"],         exit: ["m1", "m2"] },
+  journeyman:   { name: "Journeyman",   order: 3, phases: ["wh", "orch"],        exit: ["m4"] },
+  practitioner: { name: "Practitioner", order: 4, phases: ["cloud", "stream"],   exit: ["m6"] },
+  specialist:   { name: "Specialist",   order: 5, phases: ["llm"],               exit: ["m7"] },
+  candidate:    { name: "Candidate",    order: 6, phases: ["cap"],               exit: [] }
+};
+
 /* Laid out bottom-to-top: Launchpad is the base of the tree, the Capstone is the crown.
-   Lower phases sit at larger y (screen bottom); later phases climb upward. */
+   Lower phases sit at larger y (screen bottom); later phases climb upward.
+   `level` ties each constellation to its skill level above. */
 DF.PHASES = {
-  launch: { name: "Launchpad", order: 0, center: { x: 1350, y: 3720 } },
-  ai:     { name: "AI-Assisted Engineering", order: 1, center: { x: 1350, y: 3340 } },
-  sql:    { name: "SQL & Data Modeling", order: 2, center: { x: 1350, y: 2960 } },
-  py:     { name: "Python for Data Engineering", order: 3, center: { x: 1350, y: 2580 } },
-  wh:     { name: "Warehouse & Analytics Engineering", order: 4, center: { x: 1350, y: 2200 } },
-  orch:   { name: "Orchestration & DataOps", order: 5, center: { x: 1350, y: 1820 } },
-  cloud:  { name: "AWS Cloud & Lakehouse", order: 6, center: { x: 1350, y: 1440 } },
-  stream: { name: "Big Data & Streaming", order: 7, center: { x: 1350, y: 1060 } },
-  llm:    { name: "AI & LLM Engineering", order: 8, center: { x: 1350, y: 680 } },
-  cap:    { name: "Capstone & Getting Hired", order: 9, center: { x: 1350, y: 300 } }
+  launch: { name: "Launchpad", order: 0, level: "initiate", center: { x: 1350, y: 3720 } },
+  ai:     { name: "AI-Assisted Engineering", order: 1, level: "initiate", center: { x: 1350, y: 3340 } },
+  sql:    { name: "SQL & Data Modeling", order: 2, level: "apprentice", center: { x: 1350, y: 2960 } },
+  py:     { name: "Python for Data Engineering", order: 3, level: "apprentice", center: { x: 1350, y: 2580 } },
+  wh:     { name: "Warehouse & Analytics Engineering", order: 4, level: "journeyman", center: { x: 1350, y: 2200 } },
+  orch:   { name: "Orchestration & DataOps", order: 5, level: "journeyman", center: { x: 1350, y: 1820 } },
+  cloud:  { name: "AWS Cloud & Lakehouse", order: 6, level: "practitioner", center: { x: 1350, y: 1440 } },
+  stream: { name: "Big Data & Streaming", order: 7, level: "practitioner", center: { x: 1350, y: 1060 } },
+  llm:    { name: "AI & LLM Engineering", order: 8, level: "specialist", center: { x: 1350, y: 680 } },
+  cap:    { name: "Capstone & Getting Hired", order: 9, level: "candidate", center: { x: 1350, y: 300 } }
 };
 
 DF.STARS = [
@@ -86,7 +101,7 @@ DF.STARS = [
     res:[["Spec-driven development","article","https://github.blog/developer-skills/agentic-ai-mcp-and-spec-driven-development-top-blog-posts-of-2025/"]],
     iq:["Why does a written spec improve agent output?","When is spec-driven development not worth the overhead?"] },
 
-  { id:"mcp-agents", phase:"ai", title:"MCP & Tool-Augmented Agents", kind:"lesson", off:[70,-20], prereq:["context-eng"], est:"3-4 hrs", badges:["ai","emerging"],
+  { id:"mcp-agents", phase:"ai", title:"MCP & Tool-Augmented Agents", kind:"lesson", off:[70,-20], prereq:["eval-ai"], est:"3-4 hrs", badges:["ai","emerging"],
     goal:"The Model Context Protocol: wiring agents to live tools and data, with allowlists and governance.",
     obj:["Explain what MCP is and why it matters for connecting agents to systems.",
          "Connect an agent to an MCP server and use its tools.",
@@ -122,7 +137,7 @@ DF.STARS = [
     res:[["Your eval is the product","article","https://hamel.dev/blog/posts/evals/"]],
     iq:["How would you catch a subtle hallucination in AI-generated SQL?"] },
 
-  { id:"m0", phase:"ai", title:"Milestone 0 · Automate a Real Chore", kind:"project", off:[210,90], prereq:["skills-agents","eval-ai"], est:"6-10 hrs", badges:["ai"],
+  { id:"m0", phase:"ai", title:"Milestone 0 · Automate a Real Chore", kind:"project", off:[210,90], prereq:["skills-agents"], est:"6-10 hrs", badges:["ai"],
     goal:"Build a small agentic workflow you will actually reuse, shipped as a clean, standalone repo.",
     obj:["Ship a working automation you personally use.",
          "Make the AI reliable with context engineering, specs, and verification.",
@@ -139,7 +154,7 @@ DF.STARS = [
       { th:"finance", tt:"Statement categorizer", p:"An agent that categorizes and summarizes your bank/transaction exports, with an eval that checks its labels." } ] },
 
   /* ---------- 2 · SQL & Data Modeling ---------- */
-  { id:"sql1", phase:"sql", title:"SQL I · Query Foundations", kind:"lesson", off:[-230,-40], prereq:["de-map"], est:"4-5 hrs", badges:["standards"],
+  { id:"sql1", phase:"sql", title:"SQL I · Query Foundations", kind:"lesson", off:[-230,-40], prereq:["m0"], est:"4-5 hrs", badges:["standards"],
     goal:"SELECT, WHERE, ORDER BY, DISTINCT, and set-based thinking vs the loops you reach for in Python.",
     obj:["Explain why SQL is declarative and set-based, and why that matters for data work.",
          "Write confident SELECT / WHERE / ORDER BY / DISTINCT queries against real data.",
@@ -199,7 +214,7 @@ DF.STARS = [
     res:[["DuckDB docs","docs","https://duckdb.org/docs/"],["Awesome DuckDB","repo","https://github.com/davidgasquez/awesome-duckdb"]],
     iq:["When would you pick DuckDB over Snowflake?","How does an in-process engine differ from client-server?"] },
 
-  { id:"relational", phase:"sql", title:"Relational Modeling", kind:"lesson", off:[-140,60], prereq:["sql1"], est:"3-4 hrs",
+  { id:"relational", phase:"sql", title:"Relational Modeling", kind:"lesson", off:[-140,60], prereq:["sql4"], est:"3-4 hrs",
     goal:"Normalization, keys, ERDs, and OLTP vs OLAP.",
     obj:["Normalize a schema and know when to denormalize.",
          "Choose primary and foreign keys and draw an ERD.",
@@ -211,7 +226,7 @@ DF.STARS = [
     res:[["Database normalization","article","https://en.wikipedia.org/wiki/Database_normalization"],["dbdiagram.io","docs","https://dbdiagram.io/"]],
     iq:["When would you deliberately denormalize?","What is a natural vs surrogate key?"] },
 
-  { id:"dimensional", phase:"sql", title:"Dimensional Modeling", kind:"lesson", off:[190,20], prereq:["relational","sql3"], est:"3-4 hrs",
+  { id:"dimensional", phase:"sql", title:"Dimensional Modeling", kind:"lesson", off:[190,20], prereq:["relational"], est:"3-4 hrs",
     goal:"Kimball star schemas, facts and dimensions, and slowly changing dimensions.",
     obj:["Design a star schema with fact and dimension tables.",
          "Choose grain and additive vs non-additive measures.",
@@ -223,7 +238,7 @@ DF.STARS = [
     res:[["Kimball dimensional modeling","article","https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/"]],
     iq:["Explain grain and why it matters.","Type 1 vs type 2 slowly changing dimension?"] },
 
-  { id:"m1", phase:"sql", title:"Milestone 1 · Model Your World", kind:"project", off:[240,120], prereq:["sql4","dimensional","duckdb"], est:"10-14 hrs", badges:["standards"],
+  { id:"m1", phase:"sql", title:"Milestone 1 · Model Your World", kind:"project", off:[240,120], prereq:["dimensional"], est:"10-14 hrs", badges:["standards"],
     goal:"Design and load a normalized Postgres database and answer 15 real business questions with SQL.",
     obj:["Design and load a normalized schema from a domain you care about.",
          "Answer 15 real business questions in SQL; validate a few in DuckDB.",
@@ -240,7 +255,7 @@ DF.STARS = [
       { th:"transit", tt:"City Transport Explorer", p:"Model a public-transit or traffic open dataset. Answer: where and when does the city jam up?" } ] },
 
   /* ---------- 3 · Python for Data Engineering ---------- */
-  { id:"wrangling", phase:"py", title:"Data Wrangling: pandas & Polars", kind:"lesson", off:[-150,-70], prereq:["de-map"], est:"4-5 hrs", badges:["emerging"],
+  { id:"wrangling", phase:"py", title:"Data Wrangling: pandas & Polars", kind:"lesson", off:[-150,-70], prereq:["m0"], est:"4-5 hrs", badges:["emerging"],
     goal:"Reshape and clean data with pandas and Polars, and know when each wins.",
     obj:["Do the core wrangling operations: filter, group, join, pivot, window.",
          "Use Polars for speed and lazy evaluation; know when pandas is fine.",
@@ -252,7 +267,7 @@ DF.STARS = [
     res:[["Polars","docs","https://docs.pola.rs/"],["pandas","docs","https://pandas.pydata.org/docs/"]],
     iq:["Why is Polars faster than pandas for many workloads?","What is lazy evaluation and why does it help?"] },
 
-  { id:"apis", phase:"py", title:"APIs & Web Data", kind:"lesson", off:[-30,-140], prereq:["wrangling"], est:"3-4 hrs",
+  { id:"apis", phase:"py", title:"APIs & Web Data", kind:"lesson", off:[-30,-140], prereq:["prod-py"], est:"3-4 hrs",
     goal:"Pull data from live APIs: auth, pagination, rate limits, retries, and incremental extraction.",
     obj:["Authenticate and paginate through a real API.",
          "Handle rate limits with backoff and retries.",
@@ -264,7 +279,7 @@ DF.STARS = [
     res:[["HTTPX","docs","https://www.python-httpx.org/"],["tenacity (retries)","docs","https://tenacity.readthedocs.io/"]],
     iq:["How do you extract incrementally from an API?","How should a client behave under rate limiting?"] },
 
-  { id:"formats", phase:"py", title:"File Formats & Arrow", kind:"lesson", off:[-60,40], prereq:["wrangling"], est:"2-3 hrs",
+  { id:"formats", phase:"py", title:"File Formats & Arrow", kind:"lesson", off:[-60,40], prereq:["apis"], est:"2-3 hrs",
     goal:"CSV, JSON, Parquet, Avro, and Arrow: columnar vs row, compression, and why Parquet is everywhere.",
     obj:["Choose the right format for a job and explain the tradeoffs.",
          "Explain columnar vs row storage and Arrow's role.",
@@ -276,7 +291,7 @@ DF.STARS = [
     res:[["Apache Parquet","docs","https://parquet.apache.org/docs/"],["Apache Arrow","docs","https://arrow.apache.org/overview/"]],
     iq:["Why is Parquet good for analytics but bad for row-by-row writes?"] },
 
-  { id:"dlt", phase:"py", title:"dlt · Modern Ingestion", kind:"lesson", off:[90,-60], prereq:["apis","formats"], est:"3-4 hrs", badges:["emerging"],
+  { id:"dlt", phase:"py", title:"dlt · Modern Ingestion", kind:"lesson", off:[90,-60], prereq:["formats"], est:"3-4 hrs", badges:["emerging"],
     goal:"Declarative Python-native pipelines with automatic schema evolution and incremental loading.",
     obj:["Build a source-to-destination pipeline with dlt.",
          "Use automatic schema inference and evolution.",
@@ -300,7 +315,7 @@ DF.STARS = [
     res:[["pydantic","docs","https://docs.pydantic.dev/"],["pytest","docs","https://docs.pytest.org/"]],
     iq:["Why validate data at the boundary with something like pydantic?","What makes a test suite trustworthy?"] },
 
-  { id:"db-py", phase:"py", title:"Databases from Python", kind:"lesson", off:[200,20], prereq:["sql2","prod-py"], est:"2-3 hrs",
+  { id:"db-py", phase:"py", title:"Databases from Python", kind:"lesson", off:[200,20], prereq:["dlt","sql2"], est:"2-3 hrs",
     goal:"SQLAlchemy, psycopg, connection pooling, and safe, fast bulk loads.",
     obj:["Connect to Postgres from Python safely (no SQL injection).",
          "Use connection pooling and transactions correctly.",
@@ -312,7 +327,7 @@ DF.STARS = [
     res:[["SQLAlchemy","docs","https://docs.sqlalchemy.org/"],["psycopg","docs","https://www.psycopg.org/psycopg3/docs/"]],
     iq:["How do parameterized queries prevent SQL injection?","Why is row-by-row insertion slow?"] },
 
-  { id:"m2", phase:"py", title:"Milestone 2 · Ingestion Pipeline", kind:"project", off:[210,130], prereq:["dlt","db-py"], est:"12-16 hrs", badges:["standards"],
+  { id:"m2", phase:"py", title:"Milestone 2 · Ingestion Pipeline", kind:"project", off:[210,130], prereq:["db-py"], est:"12-16 hrs", badges:["standards"],
     goal:"Pull from a live API into a warehouse/DuckDB, idempotently, tested, as a standalone repo.",
     obj:["Ingest from a live API into storage with dlt, incrementally.",
          "Test it, handle failures, and document the data flow.",
@@ -329,7 +344,7 @@ DF.STARS = [
       { th:"media", tt:"Reddit / YouTube pipeline", p:"Pull posts or video stats over time into a warehouse for trend analysis." } ] },
 
   /* ---------- 4 · Warehouse & Analytics Engineering ---------- */
-  { id:"wh-concepts", phase:"wh", title:"Warehousing Concepts", kind:"lesson", off:[-220,40], prereq:["m1"], est:"2-3 hrs",
+  { id:"wh-concepts", phase:"wh", title:"Warehousing Concepts", kind:"lesson", off:[-220,40], prereq:["m1","m2"], est:"2-3 hrs",
     goal:"OLAP, columnar and MPP storage, warehouse vs lake vs lakehouse, and the cost model.",
     obj:["Explain how columnar and MPP warehouses achieve their speed.",
          "Compare warehouse, lake, and lakehouse and their tradeoffs.",
@@ -413,7 +428,7 @@ DF.STARS = [
     res:[["dbt project structure","docs","https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview"]],
     iq:["What goes in staging vs marts?","Explain bronze/silver/gold."] },
 
-  { id:"m3", phase:"wh", title:"Milestone 3 · Analytics Engineering", kind:"project", off:[240,150], prereq:["dbt-test","ae-patterns","m2"], est:"14-18 hrs", badges:["standards"],
+  { id:"m3", phase:"wh", title:"Milestone 3 · Analytics Engineering", kind:"project", off:[240,150], prereq:["ae-patterns"], est:"14-18 hrs", badges:["standards"],
     goal:"Raw to tested marts with dbt or SQLMesh, documented, as a standalone portfolio repo.",
     obj:["Transform raw data into tested, documented marts.",
          "Produce a lineage graph and a docs site.",
@@ -430,7 +445,7 @@ DF.STARS = [
       { th:"cs / cloud", tt:"BigQuery public dataset", p:"Build the marts on a BigQuery public dataset for a multi-cloud portfolio piece." } ] },
 
   /* ---------- 5 · Orchestration & DataOps ---------- */
-  { id:"orch-concepts", phase:"orch", title:"Orchestration Concepts", kind:"lesson", off:[-210,-30], prereq:["m2"], est:"2-3 hrs",
+  { id:"orch-concepts", phase:"orch", title:"Orchestration Concepts", kind:"lesson", off:[-210,-30], prereq:["m1","m2"], est:"2-3 hrs",
     goal:"DAGs, scheduling, idempotency, backfills, retries, and SLAs.",
     obj:["Explain DAGs, scheduling, and dependencies.",
          "Design idempotent tasks that support safe backfills and retries.",
@@ -478,7 +493,7 @@ DF.STARS = [
     res:[["Dagster","docs","https://docs.dagster.io/"]],
     iq:["What is a software-defined asset?","When would you choose Dagster over Airflow?"] },
 
-  { id:"dq-obs", phase:"orch", title:"Data Quality & Observability", kind:"lesson", off:[60,100], prereq:["dbt-test"], est:"3-4 hrs", badges:["standards"],
+  { id:"dq-obs", phase:"orch", title:"Data Quality & Observability", kind:"lesson", off:[60,100], prereq:["airflow-prac"], est:"3-4 hrs", badges:["standards"],
     goal:"Freshness, volume, and schema checks; Great Expectations; alerting and data downtime.",
     obj:["Add freshness, volume, and schema monitors to a pipeline.",
          "Use Great Expectations or similar for validation.",
@@ -502,7 +517,7 @@ DF.STARS = [
     res:[["Data contracts","article","https://www.datacontract.com/"]],
     iq:["What does a data contract guarantee?","Why enforce contracts in CI rather than at read time?"] },
 
-  { id:"m4", phase:"orch", title:"Milestone 4 · Orchestrated ELT", kind:"project", off:[230,140], prereq:["airflow-prac","dq-obs","m3"], est:"12-16 hrs", badges:["standards"],
+  { id:"m4", phase:"orch", title:"Milestone 4 · Orchestrated ELT", kind:"project", off:[230,140], prereq:["dq-obs","m3"], est:"12-16 hrs", badges:["standards"],
     goal:"Put ingestion + transform on a schedule with quality gates, alerting, and CI, as a standalone repo.",
     obj:["Schedule the full ingest-to-marts flow with retries and backfills.",
          "Add quality gates that stop bad data and alert you.",
@@ -517,7 +532,7 @@ DF.STARS = [
       { th:"any", tt:"Schedule your own stack", p:"Orchestrate your Milestone 2 + 3 pipeline into a reliable, monitored nightly job." } ] },
 
   /* ---------- 6 · AWS Cloud & Lakehouse ---------- */
-  { id:"aws", phase:"cloud", title:"AWS Foundations for DE", kind:"lesson", off:[-210,10], prereq:["m2"], est:"3-4 hrs", badges:["standards"],
+  { id:"aws", phase:"cloud", title:"AWS Foundations for DE", kind:"lesson", off:[-210,10], prereq:["m4"], est:"3-4 hrs", badges:["standards"],
     goal:"IAM and least privilege, S3, regions, billing and cost alarms, the CLI and boto3.",
     obj:["Set up IAM with least privilege and avoid root-account mistakes.",
          "Use S3, the AWS CLI, and boto3.",
@@ -553,7 +568,7 @@ DF.STARS = [
     res:[["AWS Glue","docs","https://docs.aws.amazon.com/glue/"]],
     iq:["When would you use Glue vs a Lambda for ETL?"] },
 
-  { id:"iceberg", phase:"cloud", title:"Lakehouse & Apache Iceberg", kind:"lesson", off:[110,-110], prereq:["s3-lake","dbt-test"], est:"4-5 hrs", badges:["emerging"],
+  { id:"iceberg", phase:"cloud", title:"Lakehouse & Apache Iceberg", kind:"lesson", off:[110,-110], prereq:["serverless"], est:"4-5 hrs", badges:["emerging"],
     goal:"Iceberg (the ~78% default table format, V3), catalogs, time travel, and schema evolution.",
     obj:["Explain what a table format adds over raw Parquet.",
          "Use Iceberg for time travel and schema evolution.",
@@ -565,7 +580,7 @@ DF.STARS = [
     res:[["Apache Iceberg","docs","https://iceberg.apache.org/docs/latest/"]],
     iq:["What does Iceberg add over plain Parquet on S3?","What is a catalog in the lakehouse world?"] },
 
-  { id:"redshift", phase:"cloud", title:"Warehousing on AWS", kind:"lesson", off:[130,70], prereq:["aws","wh-concepts"], est:"2-3 hrs",
+  { id:"redshift", phase:"cloud", title:"Warehousing on AWS", kind:"lesson", off:[130,70], prereq:["aws"], est:"2-3 hrs",
     goal:"Redshift and Redshift Serverless, and when to choose them vs Snowflake.",
     obj:["Load and query data in Redshift Serverless.",
          "Understand distribution and sort keys.",
@@ -577,7 +592,7 @@ DF.STARS = [
     res:[["Amazon Redshift","docs","https://docs.aws.amazon.com/redshift/"]],
     iq:["What are distribution and sort keys for?","When would you not use Redshift?"] },
 
-  { id:"iac", phase:"cloud", title:"Infrastructure as Code (Terraform)", kind:"lesson", off:[-40,110], prereq:["aws"], est:"4-5 hrs", badges:["standards"],
+  { id:"iac", phase:"cloud", title:"Infrastructure as Code (Terraform)", kind:"lesson", off:[-40,110], prereq:["iceberg"], est:"4-5 hrs", badges:["standards"],
     goal:"Terraform for reproducible data infrastructure - and portfolio gold.",
     obj:["Provision S3, IAM, and Glue with Terraform.",
          "Manage state, variables, and modules cleanly.",
@@ -589,7 +604,7 @@ DF.STARS = [
     res:[["Terraform","docs","https://developer.hashicorp.com/terraform/docs"]],
     iq:["Why is IaC better than clicking in the console?","What is Terraform state and why does it matter?"] },
 
-  { id:"containers", phase:"cloud", title:"Containers & CI/CD for Data", kind:"lesson", off:[210,-20], prereq:["iac","prod-py"], est:"3-4 hrs", badges:["standards"],
+  { id:"containers", phase:"cloud", title:"Containers & CI/CD for Data", kind:"lesson", off:[210,-20], prereq:["iac"], est:"3-4 hrs", badges:["standards"],
     goal:"Docker images, a taste of ECS/Fargate, and GitHub Actions pipelines.",
     obj:["Containerize a data job with a clean Dockerfile.",
          "Run tests and lint in GitHub Actions.",
@@ -601,7 +616,7 @@ DF.STARS = [
     res:[["GitHub Actions","docs","https://docs.github.com/actions"]],
     iq:["What should CI run on every pull request for a data repo?"] },
 
-  { id:"m5", phase:"cloud", title:"Milestone 5 · Cloud Lakehouse Platform", kind:"project", off:[240,120], prereq:["iceberg","iac","containers","m4"], est:"20-28 hrs", badges:["standards"],
+  { id:"m5", phase:"cloud", title:"Milestone 5 · Cloud Lakehouse Platform", kind:"project", off:[240,120], prereq:["containers"], est:"20-28 hrs", badges:["standards"],
     goal:"Ingest to an S3 Iceberg lake to a warehouse, all Terraform, all CI - your centerpiece repo.",
     obj:["Build ingest to S3 Iceberg lake to Glue/Athena to a warehouse.",
          "Provision everything with Terraform and run it through CI.",
@@ -618,7 +633,7 @@ DF.STARS = [
       { th:"media", tt:"Media lakehouse", p:"A lakehouse over listening/viewing/gaming data with rich historical marts." } ] },
 
   /* ---------- 7 · Big Data & Streaming ---------- */
-  { id:"dist", phase:"stream", title:"Distributed Computing Concepts", kind:"lesson", off:[-210,-20], prereq:["m3"], est:"2-3 hrs",
+  { id:"dist", phase:"stream", title:"Distributed Computing Concepts", kind:"lesson", off:[-210,-20], prereq:["m4"], est:"2-3 hrs",
     goal:"Partitioning, shuffles, the MapReduce lineage, and when you actually need Spark.",
     obj:["Explain partitioning and why shuffles are expensive.",
          "Trace the lineage from MapReduce to Spark.",
@@ -642,7 +657,7 @@ DF.STARS = [
     res:[["PySpark","docs","https://spark.apache.org/docs/latest/api/python/"]],
     iq:["Transformation vs action in Spark?","What causes and how do you fix data skew?"] },
 
-  { id:"stream-concepts", phase:"stream", title:"Streaming Concepts", kind:"lesson", off:[10,-30], prereq:["dist"], est:"2-3 hrs",
+  { id:"stream-concepts", phase:"stream", title:"Streaming Concepts", kind:"lesson", off:[10,-30], prereq:["spark"], est:"2-3 hrs",
     goal:"Batch vs stream, event time vs processing time, windows, and exactly-once.",
     obj:["Contrast batch and streaming and when each fits.",
          "Reason about event time, watermarks, and windows.",
@@ -666,7 +681,7 @@ DF.STARS = [
     res:[["Apache Kafka","docs","https://kafka.apache.org/documentation/"],["Redpanda","docs","https://docs.redpanda.com/"]],
     iq:["How do partitions relate to ordering and parallelism?","What is a consumer group?"] },
 
-  { id:"stream-proc", phase:"stream", title:"Stream Processing", kind:"lesson", off:[150,60], prereq:["kafka","spark"], est:"3-4 hrs",
+  { id:"stream-proc", phase:"stream", title:"Stream Processing", kind:"lesson", off:[150,60], prereq:["kafka"], est:"3-4 hrs",
     goal:"Spark Structured Streaming and a taste of Flink.",
     obj:["Build a streaming job with windowed aggregations.",
          "Handle state and late data.",
@@ -690,7 +705,7 @@ DF.STARS = [
     res:[["ClickHouse","docs","https://clickhouse.com/docs"]],
     iq:["Why is ClickHouse fast for real-time analytics?","When do you need real-time OLAP vs a warehouse?"] },
 
-  { id:"m6", phase:"stream", title:"Milestone 6 · Real-Time Pipeline", kind:"project", off:[240,130], prereq:["stream-proc","realtime-db","m5"], est:"18-24 hrs", badges:["standards"],
+  { id:"m6", phase:"stream", title:"Milestone 6 · Real-Time Pipeline", kind:"project", off:[240,130], prereq:["stream-proc","m5"], est:"18-24 hrs", badges:["standards"],
     goal:"Live events to Kafka to a stream processor to ClickHouse to a live dashboard - a standalone repo.",
     obj:["Ingest live events and process them in a stream.",
          "Serve fresh results to a live dashboard.",
@@ -707,7 +722,7 @@ DF.STARS = [
       { th:"media / gaming", tt:"Live match events", p:"Stream live match or game events into a real-time stats dashboard." } ] },
 
   /* ---------- 8 · AI & LLM Engineering ---------- */
-  { id:"ml-fund", phase:"llm", title:"ML Fundamentals for Engineers", kind:"lesson", off:[-260,60], prereq:["db-py"], est:"5-6 hrs",
+  { id:"ml-fund", phase:"llm", title:"ML Fundamentals for Engineers", kind:"lesson", off:[-260,60], prereq:["m6"], est:"5-6 hrs",
     goal:"The ML lifecycle, train/val/test, metrics, overfitting, feature engineering; one clean sklearn model.",
     obj:["Explain the ML lifecycle and train/validation/test splits.",
          "Choose metrics and diagnose overfitting.",
@@ -719,7 +734,7 @@ DF.STARS = [
     res:[["scikit-learn","docs","https://scikit-learn.org/stable/"]],
     iq:["What is data leakage and how do you prevent it?","How do you pick a metric for an imbalanced problem?"] },
 
-  { id:"ml-pipe", phase:"llm", title:"ML Data Pipelines & Feature Stores", kind:"lesson", off:[-160,-60], prereq:["ml-fund","m3"], est:"3-4 hrs",
+  { id:"ml-pipe", phase:"llm", title:"ML Data Pipelines & Feature Stores", kind:"lesson", off:[-160,-60], prereq:["ml-fund"], est:"3-4 hrs",
     goal:"How data engineering feeds ML: training-data pipelines and the feature-store idea (Feast).",
     obj:["Build a reproducible training-data pipeline.",
          "Explain the offline/online skew problem a feature store solves.",
@@ -731,7 +746,7 @@ DF.STARS = [
     res:[["Feast","docs","https://docs.feast.dev/"]],
     iq:["What is offline/online skew?","Why is point-in-time correctness critical for features?"] },
 
-  { id:"mlops", phase:"llm", title:"MLOps", kind:"lesson", off:[-40,-130], prereq:["ml-fund","containers"], est:"4-5 hrs", badges:["standards"],
+  { id:"mlops", phase:"llm", title:"MLOps", kind:"lesson", off:[-40,-130], prereq:["ml-fund"], est:"4-5 hrs", badges:["standards"],
     goal:"Experiment tracking (MLflow), model registry, packaging, serving (FastAPI), monitoring, and drift.",
     obj:["Track experiments and register models with MLflow.",
          "Serve a model behind a FastAPI endpoint.",
@@ -779,7 +794,7 @@ DF.STARS = [
     res:[["ragas","docs","https://docs.ragas.io/"],["Evals guide","article","https://hamel.dev/blog/posts/evals/"]],
     iq:["How do you evaluate RAG offline vs online?","What are the failure modes of LLM-as-judge?"] },
 
-  { id:"llm-apps", phase:"llm", title:"LLM Apps, Agents & Orchestration", kind:"lesson", off:[180,20], prereq:["rag"], est:"4-5 hrs", badges:["emerging"],
+  { id:"llm-apps", phase:"llm", title:"LLM Apps, Agents & Orchestration", kind:"lesson", off:[180,20], prereq:["eval-llm"], est:"4-5 hrs", badges:["emerging"],
     goal:"LangChain/LlamaIndex, tool use, structured outputs, and multi-agent patterns.",
     obj:["Build an LLM app with tool use and structured outputs.",
          "Design a simple multi-agent workflow.",
@@ -803,7 +818,7 @@ DF.STARS = [
     res:[["OWASP LLM Top 10","article","https://owasp.org/www-project-top-10-for-large-language-model-applications/"]],
     iq:["How does prompt injection work and how do you defend against it?"] },
 
-  { id:"llmops", phase:"llm", title:"LLMOps in Production", kind:"lesson", off:[300,80], prereq:["llm-apps","mlops"], est:"3-4 hrs", badges:["emerging","standards"],
+  { id:"llmops", phase:"llm", title:"LLMOps in Production", kind:"lesson", off:[300,80], prereq:["llm-apps"], est:"3-4 hrs", badges:["emerging","standards"],
     goal:"Prompt/version management, observability (Langfuse/LangSmith), caching, model routing, and cost/latency.",
     obj:["Instrument an LLM app with tracing and observability.",
          "Cache and route between models to control cost and latency.",
@@ -815,7 +830,7 @@ DF.STARS = [
     res:[["Langfuse","docs","https://langfuse.com/docs"]],
     iq:["What do you monitor for an LLM app in production?","How does model routing save cost?"] },
 
-  { id:"mcp-server", phase:"llm", title:"Build an MCP Server + GenAI Data Pipelines", kind:"lesson", off:[70,130], prereq:["mcp-agents","rag","dlt"], est:"4-5 hrs", badges:["emerging","ai"],
+  { id:"mcp-server", phase:"llm", title:"Build an MCP Server + GenAI Data Pipelines", kind:"lesson", off:[70,130], prereq:["llm-apps"], est:"4-5 hrs", badges:["emerging","ai"],
     goal:"Serve your data to agents via MCP; ingest and prepare unstructured data at scale for RAG.",
     obj:["Build your own MCP server exposing your data and tools to agents.",
          "Build a pipeline that prepares messy unstructured data for RAG.",
@@ -827,7 +842,7 @@ DF.STARS = [
     res:[["MCP","docs","https://modelcontextprotocol.io/"]],
     iq:["Why is preparing unstructured data the hard part of production RAG?","What would you expose through an MCP server and what would you not?"] },
 
-  { id:"m7", phase:"llm", title:"Milestone 7 · AI Product on Your Data", kind:"project", off:[300,170], prereq:["rag","eval-llm","mcp-server"], est:"18-24 hrs", badges:["emerging","ai","standards"],
+  { id:"m7", phase:"llm", title:"Milestone 7 · AI Product on Your Data", kind:"project", off:[300,170], prereq:["mcp-server"], est:"18-24 hrs", badges:["emerging","ai","standards"],
     goal:"An advanced AI product on your own data, with a real eval harness - a standalone portfolio repo.",
     obj:["Ship an AI product on data you care about.",
          "Prove quality with an eval harness and guardrails.",
@@ -844,7 +859,7 @@ DF.STARS = [
       { th:"cs / automation", tt:"MCP server over your data", p:"Expose a personal dataset to Claude/agents via your own MCP server, with guardrails." } ] },
 
   /* ---------- 9 · Capstone & Getting Hired ---------- */
-  { id:"capstone", phase:"cap", title:"The Capstone", kind:"capstone", off:[-120,-10], prereq:["m5","m6","m7"], est:"40-60 hrs", badges:["standards"],
+  { id:"capstone", phase:"cap", title:"The Capstone", kind:"capstone", off:[-120,-10], prereq:["m7"], est:"40-60 hrs", badges:["standards"],
     goal:"One end-to-end platform fusing ingestion, lakehouse, warehouse, transform, streaming, and an AI feature.",
     obj:["Fuse the milestones into one coherent platform.",
          "Document it with architecture diagrams and decision records.",
@@ -858,7 +873,7 @@ DF.STARS = [
     options:[
       { th:"your theme", tt:"Unify your milestones", p:"Combine your favorite milestones into one platform on a theme you care about, end to end." } ] },
 
-  { id:"portfolio", phase:"cap", title:"Portfolio & GitHub Craft", kind:"lesson", off:[30,-110], prereq:["m5"], est:"3-4 hrs", badges:["standards"],
+  { id:"portfolio", phase:"cap", title:"Portfolio & GitHub Craft", kind:"lesson", off:[30,-110], prereq:["capstone"], est:"3-4 hrs", badges:["standards"],
     goal:"READMEs, architecture diagrams, writeups, and making repos legible in 60 seconds.",
     obj:["Write a README that sells a project in 60 seconds.",
          "Produce clean architecture diagrams and a short writeup or blog post.",
@@ -870,7 +885,7 @@ DF.STARS = [
     res:[["Make a README","article","https://www.makeareadme.com/"]],
     iq:["What does a hiring manager look for in the first 60 seconds of a repo?"] },
 
-  { id:"sysdesign", phase:"cap", title:"System Design for Data & AI", kind:"lesson", off:[110,60], prereq:["capstone"], est:"4-5 hrs",
+  { id:"sysdesign", phase:"cap", title:"System Design for Data & AI", kind:"lesson", off:[110,60], prereq:["portfolio"], est:"4-5 hrs",
     goal:"Designing pipelines, platforms, and RAG systems in interviews: tradeoffs and sizing.",
     obj:["Structure a data/AI system-design answer under time pressure.",
          "Reason about tradeoffs and do back-of-envelope sizing.",
@@ -894,7 +909,7 @@ DF.STARS = [
     res:[["DataLemur (SQL)","article","https://datalemur.com/"],["LeetCode","article","https://leetcode.com/"]],
     iq:["Tell me about a data pipeline you built and a hard tradeoff you made."] },
 
-  { id:"jobhunt", phase:"cap", title:"Positioning & Job Hunt", kind:"lesson", off:[240,110], prereq:["portfolio","interview"], est:"ongoing", badges:["standards"],
+  { id:"jobhunt", phase:"cap", title:"Positioning & Job Hunt", kind:"lesson", off:[240,110], prereq:["interview"], est:"ongoing", badges:["standards"],
     goal:"Resume, LinkedIn, DE vs AI-leaning targeting, and the narrative threading your projects.",
     obj:["Write a resume and LinkedIn that pass the six-second scan.",
          "Target DE vs AI-leaning roles deliberately.",
