@@ -14,12 +14,11 @@ DF.LEVEL = "I am a Computer Science graduate: a strong programmer, comfortable i
    previous level's exit milestone(s), so a level unlocks only when the prior one is complete
    (electives excepted). LEVELS is descriptive metadata; the gating lives in the prereq graph. */
 DF.LEVELS = {
-  initiate:     { name: "Initiate",     order: 1, phases: ["launch", "ai"],      exit: ["m0"] },
-  apprentice:   { name: "Apprentice",   order: 2, phases: ["sql", "py"],         exit: ["m1", "m2"] },
-  journeyman:   { name: "Journeyman",   order: 3, phases: ["wh", "orch"],        exit: ["m4"] },
-  practitioner: { name: "Practitioner", order: 4, phases: ["cloud", "stream"],   exit: ["m6"] },
-  specialist:   { name: "Specialist",   order: 5, phases: ["llm"],               exit: ["m7"] },
-  candidate:    { name: "Candidate",    order: 6, phases: ["cap"],               exit: [] }
+  initiate:   { name: "Initiate",   order: 1, phases: ["launch", "ai", "sql", "py"], exit: ["m0", "m1", "m2"] },
+  apprentice: { name: "Apprentice", order: 2, phases: ["wh", "orch"],               exit: ["m4"] },
+  journeyman: { name: "Journeyman", order: 3, phases: ["cloud", "stream"],          exit: ["m6"] },
+  specialist: { name: "Specialist", order: 4, phases: ["llm"],                      exit: ["m7"] },
+  candidate:  { name: "Candidate",  order: 5, phases: ["cap"],                      exit: [] }
 };
 
 /* Laid out bottom-to-top: Launchpad is the base of the tree, the Capstone is the crown.
@@ -28,12 +27,12 @@ DF.LEVELS = {
 DF.PHASES = {
   launch: { name: "Launchpad", order: 0, level: "initiate", center: { x: 1350, y: 3720 } },
   ai:     { name: "AI-Assisted Engineering", order: 1, level: "initiate", center: { x: 1350, y: 3340 } },
-  sql:    { name: "SQL & Data Modeling", order: 2, level: "apprentice", center: { x: 1350, y: 2960 } },
-  py:     { name: "Python for Data Engineering", order: 3, level: "apprentice", center: { x: 1350, y: 2580 } },
-  wh:     { name: "Warehouse & Analytics Engineering", order: 4, level: "journeyman", center: { x: 1350, y: 2200 } },
-  orch:   { name: "Orchestration & DataOps", order: 5, level: "journeyman", center: { x: 1350, y: 1820 } },
-  cloud:  { name: "AWS Cloud & Lakehouse", order: 6, level: "practitioner", center: { x: 1350, y: 1440 } },
-  stream: { name: "Big Data & Streaming", order: 7, level: "practitioner", center: { x: 1350, y: 1060 } },
+  sql:    { name: "SQL & Data Modeling", order: 2, level: "initiate", center: { x: 1350, y: 2960 } },
+  py:     { name: "Python for Data Engineering", order: 3, level: "initiate", center: { x: 1350, y: 2580 } },
+  wh:     { name: "Warehouse & Analytics Engineering", order: 4, level: "apprentice", center: { x: 1350, y: 2200 } },
+  orch:   { name: "Orchestration & DataOps", order: 5, level: "apprentice", center: { x: 1350, y: 1820 } },
+  cloud:  { name: "AWS Cloud & Lakehouse", order: 6, level: "journeyman", center: { x: 1350, y: 1440 } },
+  stream: { name: "Big Data & Streaming", order: 7, level: "journeyman", center: { x: 1350, y: 1060 } },
   llm:    { name: "AI & LLM Engineering", order: 8, level: "specialist", center: { x: 1350, y: 680 } },
   cap:    { name: "Capstone & Getting Hired", order: 9, level: "candidate", center: { x: 1350, y: 300 } }
 };
@@ -154,7 +153,7 @@ DF.STARS = [
       { th:"finance", tt:"Statement categorizer", p:"An agent that categorizes and summarizes your bank/transaction exports, with an eval that checks its labels." } ] },
 
   /* ---------- 2 · SQL & Data Modeling ---------- */
-  { id:"sql1", phase:"sql", title:"SQL I · Query Foundations", kind:"lesson", off:[-230,-40], prereq:["m0"], est:"4-5 hrs", badges:["standards"],
+  { id:"sql1", phase:"sql", title:"SQL I · Query Foundations", kind:"lesson", off:[-230,-40], prereq:["de-map"], est:"4-5 hrs", badges:["standards"],
     goal:"SELECT, WHERE, ORDER BY, DISTINCT, and set-based thinking vs the loops you reach for in Python.",
     obj:["Explain why SQL is declarative and set-based, and why that matters for data work.",
          "Write confident SELECT / WHERE / ORDER BY / DISTINCT queries against real data.",
@@ -255,7 +254,7 @@ DF.STARS = [
       { th:"transit", tt:"City Transport Explorer", p:"Model a public-transit or traffic open dataset. Answer: where and when does the city jam up?" } ] },
 
   /* ---------- 3 · Python for Data Engineering ---------- */
-  { id:"wrangling", phase:"py", title:"Data Wrangling: pandas & Polars", kind:"lesson", off:[-150,-70], prereq:["m0"], est:"4-5 hrs", badges:["emerging"],
+  { id:"wrangling", phase:"py", title:"Data Wrangling: pandas & Polars", kind:"lesson", off:[-150,-70], prereq:["de-map"], est:"4-5 hrs", badges:["emerging"],
     goal:"Reshape and clean data with pandas and Polars, and know when each wins.",
     obj:["Do the core wrangling operations: filter, group, join, pivot, window.",
          "Use Polars for speed and lazy evaluation; know when pandas is fine.",
@@ -344,7 +343,7 @@ DF.STARS = [
       { th:"media", tt:"Reddit / YouTube pipeline", p:"Pull posts or video stats over time into a warehouse for trend analysis." } ] },
 
   /* ---------- 4 · Warehouse & Analytics Engineering ---------- */
-  { id:"wh-concepts", phase:"wh", title:"Warehousing Concepts", kind:"lesson", off:[-220,40], prereq:["m1","m2"], est:"2-3 hrs",
+  { id:"wh-concepts", phase:"wh", title:"Warehousing Concepts", kind:"lesson", off:[-220,40], prereq:["m0","m1","m2"], est:"2-3 hrs",
     goal:"OLAP, columnar and MPP storage, warehouse vs lake vs lakehouse, and the cost model.",
     obj:["Explain how columnar and MPP warehouses achieve their speed.",
          "Compare warehouse, lake, and lakehouse and their tradeoffs.",
@@ -445,7 +444,7 @@ DF.STARS = [
       { th:"cs / cloud", tt:"BigQuery public dataset", p:"Build the marts on a BigQuery public dataset for a multi-cloud portfolio piece." } ] },
 
   /* ---------- 5 · Orchestration & DataOps ---------- */
-  { id:"orch-concepts", phase:"orch", title:"Orchestration Concepts", kind:"lesson", off:[-210,-30], prereq:["m1","m2"], est:"2-3 hrs",
+  { id:"orch-concepts", phase:"orch", title:"Orchestration Concepts", kind:"lesson", off:[-210,-30], prereq:["m0","m1","m2"], est:"2-3 hrs",
     goal:"DAGs, scheduling, idempotency, backfills, retries, and SLAs.",
     obj:["Explain DAGs, scheduling, and dependencies.",
          "Design idempotent tasks that support safe backfills and retries.",

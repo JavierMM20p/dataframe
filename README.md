@@ -12,11 +12,12 @@ own AI (Claude, ChatGPT, or Claude Code), which then runs the lesson as your pro
 - **Navigable galaxy** of ~70 lessons and projects across 10 constellations, from SQL and
   Python foundations to dbt/SQLMesh, orchestration, an AWS lakehouse, streaming, and advanced
   LLM/AI engineering (RAG, evals, MCP, LLMOps).
-- **Six gated skill levels** — a pre-hire ladder (Initiate → Apprentice → Journeyman →
-  Practitioner → Specialist → Candidate). Each level unlocks only when the previous one is
-  complete, and inside a level topics run as two interleaved threads so you alternate subjects
-  instead of grinding one. A streamlined main path plus optional electives means one clear
-  route, not a maze of choices.
+- **Five gated skill levels** — a pre-hire ladder (Initiate → Apprentice → Journeyman →
+  Specialist → Candidate). Each level unlocks only when the previous one is complete. Inside a
+  level, topics run as interleaved threads so you alternate subjects instead of grinding one:
+  the Initiate foundation weaves AI, SQL, and Python together; later levels pair warehouse with
+  orchestration, and cloud with streaming. A streamlined path plus optional electives keeps it
+  a clear route, not a maze of choices.
 - **AI as the professor.** Every star builds a full, structured prompt: a Socratic teaching
   persona, an AI-leverage module, professional-standards enforcement, objectives, a hands-on
   brief, and a definition of done. Copy it, or open Claude/ChatGPT in one click.
