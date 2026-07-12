@@ -155,6 +155,7 @@ button{font-family:inherit;color:inherit}
 .chip.state{margin-left:auto;color:var(--ink);border-color:var(--line-3)}
 .chip.state.complete{background:var(--ink);color:var(--void);border-color:var(--ink)}
 .p-phase{font-family:var(--font-mono);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.p-level{color:var(--ink);border:1px solid var(--line-3);border-radius:3px;padding:1px 6px;margin-right:8px}
 .panel h2{margin:0 0 7px;font-size:23px;line-height:1.16;letter-spacing:-.2px;text-wrap:balance;font-weight:600}
 .p-meta{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.4px;color:var(--dim);margin-bottom:20px}
 .locked-banner{font-family:var(--font-mono);font-size:11px;line-height:1.55;color:var(--dim);

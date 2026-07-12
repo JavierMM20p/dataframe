@@ -36,7 +36,9 @@
     var h = "";
     h += '<div class="p-badges">' + badgeChips +
          '<span class="chip state ' + status + '">' + STATE[status] + "</span></div>";
-    h += '<div class="p-phase">' + esc(DF.PHASES[s.phase].name) + " / " + kindLabel(s) + "</div>";
+    var lvl = DF.LEVELS && DF.LEVELS[DF.PHASES[s.phase].level];
+    var lvlTag = lvl ? '<span class="p-level">Level ' + lvl.order + " · " + esc(lvl.name) + "</span>" : "";
+    h += '<div class="p-phase">' + lvlTag + esc(DF.PHASES[s.phase].name) + " / " + kindLabel(s) + "</div>";
     h += "<h2>" + esc(s.title) + "</h2>";
     h += '<div class="p-meta">~' + esc(s.est || "") + " &nbsp;/&nbsp; your AI teaches it live</div>";
 
